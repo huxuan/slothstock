@@ -5,19 +5,19 @@
 [![Python Versions](https://img.shields.io/pypi/pyversions/slothstock.svg)](https://pypi.python.org/pypi/slothstock/)
 [![Downloads](https://pepy.tech/badge/slothstock)](https://pepy.tech/project/slothstock)
 
-Stock for Sloth.
+懒人股票
 
-*Read this in other languages: [English](README.md), [简体中文](README-zh.md).*
+*其他语言版本: [English](README.md), [简体中文](README-zh.md).*
 
-## Getting Started
+## 入门指南
 
-### Installation
+### 安装
 
 ```shell
 pip install -U slothstock
 ```
 
-### Usage
+### 使用
 
 ```shell
 $ sloth-buy -h
@@ -41,7 +41,7 @@ optional arguments:
   -v, --version         show program's version number and exit
 ```
 
-## Running the tests
+## 运行测试
 
 ```shell
 tox
@@ -49,19 +49,19 @@ tox
 
 ## TODO
 
-- [x] Fetch stock information from XueQiu.
-- [x] MACD indicators.
-- [x] Wechat push notification.
-- [x] Basic unittest with postive cases and structure.
-- [x] EBK file import and export.
-- [x] Buy signal script.
-- [ ] Sell signal script.
-- [ ] Cronjob guide or something similar.
-- [ ] Monitored stocks management.
-- [ ] Documentation.
-- [ ] More robust unittest.
+- [x] 从雪球获取股票信息。
+- [x] MACD 指标。
+- [x] 微信消息推送。
+- [x] 基本的单元测试，包括正例和基本框架。
+- [x] EBK 文件的导入导出。
+- [x] 买点信号脚本。
+- [ ] 卖点信号脚本。
+- [ ] 类似于 Cronjob 的指引。
+- [ ] 监控股票管理。
+- [ ] 文档。
+- [ ] 更完备的单元测试。
 
-## Contribution
+## 贡献
 
-- Comments or suggestions via github issues.
-- Pull requests are welcome absolutely.
+- 通过 Github Issues 提交评论或建议。
+- 直接提交 Pull Requests 必须没问题。
