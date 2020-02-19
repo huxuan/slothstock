@@ -7,13 +7,15 @@ File: setup.py
 Author: huxuan
 Email: i(at)huxuan.org
 """
+from pkg_resources import DistributionNotFound
+from pkg_resources import get_distribution
 from setuptools import find_packages
 from setuptools import setup
 
 NAME = 'slothstock'
 
 DESCRIPTION = (
-    'Stocks for Sloth.'
+    'Stock for Sloth.'
 )
 
 CLASSIFIERS = [
@@ -38,12 +40,21 @@ KEYWORDS = [
     'stock',
 ]
 
-PROJECT_URL = 'https://github.com/huxuan/slothstock'
+try:
+    VERSION = f'v{get_distribution(NAME).version}'
+except DistributionNotFound:
+    VERSION = 'master'
+
+PROJECT_URL = f'https://github.com/huxuan/{NAME}'
+BASE_URL = f'{PROJECT_URL}/blob/{VERSION}'
 
 
 def readme():
     """Parse README for long_description."""
     content = open('README.md').read()
+    content = content.replace('README.md', f'{BASE_URL}/README.md', 1)
+    content = content.replace('README-en.md', f'{BASE_URL}/README-en.md', 1)
+    content = content.replace('README-zh.md', f'{BASE_URL}/README-zh.md', 1)
     return content
 
 
@@ -55,7 +66,7 @@ setup(name=NAME,
       keywords=' '.join(KEYWORDS),
       url=PROJECT_URL,
       author='Xuan (Sean) Hu',
-      author_email='i+slothstock@huxuan.org',
+      author_email=f'i+{NAME}@huxuan.org',
       license='MIT',
       packages=find_packages(exclude=['tests']),
       use_scm_version=True,

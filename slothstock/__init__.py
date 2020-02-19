@@ -15,5 +15,5 @@ __version__ = '0.0.0'
 try:
     __version__ = get_distribution(__name__).version
 except DistributionNotFound:
-     # package is not installed
+    # package is not installed
     pass
