@@ -8,17 +8,6 @@ Author: huxuan
 Email: i(at)huxuan.org
 """
 
-ASHARE_PREFIX = set({
-    '000',
-    '001',
-    '002',
-    '003',
-    '300',
-    '600',
-    '601',
-    '603',
-    '688',
-})
 DATETIME_FORMAT = '%Y-%m-%d %H:%M'
 FORMAT_EBK = 'ebk'
 HEADER_USER_AGENT = 'User-Agent'
@@ -34,3 +23,11 @@ PERIODS = [
     'year',
 ]
 PERIODS_VALID = PERIODS[1:5]
+STOCK_PREFIX_MARKET = {
+    '00': 'SZ',
+    '15': 'SZ',
+    '30': 'SZ',
+    '51': 'SH',
+    '60': 'SH',
+    '68': 'SH',
+}

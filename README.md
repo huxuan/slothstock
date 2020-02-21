@@ -52,10 +52,13 @@ tox
 - [x] Fetch stock information from XueQiu.
 - [x] MACD indicators.
 - [x] Wechat push notification.
-- [x] Basic unittest with postive cases and structure.
+- [x] Basic unittest with positive cases and structure.
 - [x] EBK file import and export.
+- [x] Daemon mode.
 - [x] Buy signal script.
 - [ ] Sell signal script.
+- [ ] Add cache for frequent fetched data.
+- [ ] logger.
 - [ ] Cronjob guide or something similar.
 - [ ] Monitored stocks management.
 - [ ] Documentation.

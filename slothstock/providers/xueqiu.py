@@ -152,11 +152,11 @@ class MetaXueQiu(type):
     def list_ashare(cls, **params):
         """List A Share stocks."""
         data = cls.list(**params)
-        return data[data.index.str[:3].isin(constants.ASHARE_PREFIX)]
+        return data[data.index.str[:2].isin(constants.STOCK_PREFIX_MARKET)]
 
     @classmethod
     def list_etf(cls, **params):
-        """List ETFs."""
+        """List ETF."""
         params.update({
             'parent_type': 1,
             'size': params.get('size', 300),

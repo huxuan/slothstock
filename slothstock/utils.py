@@ -7,8 +7,6 @@ File: utils.py
 Author: huxuan
 Email: i(at)huxuan.org
 """
-from datetime import datetime
-from datetime import timedelta
 
 from wxpusher import WxPusher
 
@@ -41,19 +39,10 @@ def import_ebk(filename):
     return res
 
 
-def send_notification(stocks, title, token, topic_ids, uids):
-    """Send buy signal notification."""
+def send_notification(content, token, topic_ids, uids):
+    """Send notification."""
     if not token:
         return
     if not uids and not topic_ids:
         return
-    content = [title]
-    content.extend([
-        f'{symbol} {stocks.loc[symbol, "name"]}'
-        for symbol in stocks.index
-    ])
-    content.append(str(datetime.utcnow() + timedelta(hours=8)))
-    WxPusher.send_message('\n'.join(content),
-                          uids=uids,
-                          topic_ids=topic_ids,
-                          token=token)
+    WxPusher.send_message(content, uids=uids, topic_ids=topic_ids, token=token)

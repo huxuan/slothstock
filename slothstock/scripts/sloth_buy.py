@@ -8,6 +8,8 @@ Author: huxuan
 Email: i(at)huxuan.org
 """
 import argparse
+from datetime import datetime
+from datetime import timedelta
 import time
 
 import numpy
@@ -26,15 +28,17 @@ def parse_args():
     """Argument Parser."""
     parser = argparse.ArgumentParser()
     parser.add_argument('--token')
-    parser.add_argument('--filter-st', action='store_false')
-    parser.add_argument('--filter-suspend', action='store_false')
+    parser.add_argument('--reserve-st', action='store_false')
+    parser.add_argument('--reserve-suspend', action='store_false')
     parser.add_argument('--topic-ids', action='append', default=[])
     parser.add_argument('--uids', action='append', default=[])
+    parser.add_argument('-d', '--daemon', action='store_true')
     parser.add_argument('-e', '--ebk', action='append', default=[])
-    parser.add_argument('-i', '--interval', default=1, type=int)
+    parser.add_argument('-i', '--interval', default=0.1, type=float)
     parser.add_argument('-o', '--output', default='sloth.ebk')
     parser.add_argument('-p', '--period', default='day')
     parser.add_argument('-s', '--strict', action='store_true')
+    parser.add_argument('-t', '--title')
     parser.add_argument('-v', '--version', action='version',
                         version=__version__)
     return parser.parse_args()
@@ -61,17 +65,17 @@ def check_buy(stocks, args):
     idx = constants.PERIODS.index(args.period)
     symbols = stocks.sample(frac=1).index
 
-    pbar = tqdm(symbols)
+    pbar = tqdm(symbols, disable=args.daemon)
     for symbol in pbar:
         pbar.set_description(symbol)
 
-        # Filter ST stocks.
-        if args.filter_st and 'name' in stocks.columns and \
+        # Whether to reserve ST stocks.
+        if args.reserve_st and 'name' in stocks.columns and \
                 'ST' in stocks.loc[symbol, 'name']:
             continue
 
-        # Filter suspended stocks.
-        if args.filter_suspend and 'volume' in stocks.columns and \
+        # Whether to reserve suspended stocks.
+        if args.reserve_suspend and 'volume' in stocks.columns and \
                 numpy.isnan(stocks.loc[symbol, 'volume']):
             continue
 
@@ -126,14 +130,24 @@ def main():
 
     stocks = load_stocks(args.ebk)
     stocks = check_buy(stocks, args)
-    title = f'{args.period}级别可能买点'
-    if stocks.index.empty:
-        title = f'{args.period}级别无可能买点'
-    print(title)
-    print(stocks)
+
     utils.export_ebk(stocks.index, args.output)
-    utils.send_notification(
-        stocks, title, args.token, args.topic_ids, args.uids)
+
+    title = args.title
+    if not title:
+        title = f'{args.period}级别可能买点'
+        if stocks.index.empty:
+            title = f'{args.period}级别无可能买点'
+
+    content = [title]
+    content.extend([
+        f'{symbol} {stocks.loc[symbol, "name"]}'
+        for symbol in stocks.index
+    ])
+    content.append(str(datetime.utcnow() + timedelta(hours=8)))
+    content = '\n'.join(content)
+    print(content)
+    utils.send_notification(content, args.token, args.topic_ids, args.uids)
 
 
 if __name__ == '__main__':
