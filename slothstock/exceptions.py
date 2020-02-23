@@ -26,7 +26,7 @@ class InvalidResultError(BaseCustomException):
 
 
 class NoResponseError(BaseCustomException):
-    """Raised when no reponse fetched."""
+    """Raised when no response fetched."""
 
 
 class NoResultError(BaseCustomException):

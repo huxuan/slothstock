@@ -21,14 +21,17 @@ def clean_macd(closes, fastperiod=12, slowperiod=26, signalperiod=9):
     return macd, macdsignal, macdhist
 
 
-def is_expand_golden_cross(macdhist):
-    """Check whether the macd is expanding golden cross."""
-    if len(macdhist) < 2:
+def is_golden_cross(macdhist, strict=False):
+    """Check whether the macd is golden cross."""
+    if len(macdhist) < 1 or macdhist[-1] < 0:
         return False
-    return macdhist[-1] >= 0 and macdhist[-1] >= macdhist[-2]
+    if strict:
+        if len(macdhist) < 2 or macdhist[-1] < macdhist[-2]:
+            return False
+    return True
 
 
-def is_negative(macd, macdsignal, strict=True):
+def is_negative(macd, macdsignal, strict=False):
     """Check whether the macd is negative."""
     if len(macd) < 1:
         return False
@@ -37,7 +40,7 @@ def is_negative(macd, macdsignal, strict=True):
     return macd[-1] <= 0 or macdsignal[-1] <= 0
 
 
-def is_positive(macd, macdsignal, strict=True):
+def is_positive(macd, macdsignal, strict=False):
     """Check whether the macd is positive."""
     if len(macd) < 1:
         return False
@@ -46,7 +49,7 @@ def is_positive(macd, macdsignal, strict=True):
     return macd[-1] >= 0 or macdsignal[-1] >= 0
 
 
-def is_about_to_death_cross(macdhist, strict=True):
+def is_about_to_death_cross(macdhist, strict=False):
     """Check whether is going to be death cross."""
     if len(macdhist) < 1 or macdhist[-1] < 0:
         return False
@@ -55,7 +58,7 @@ def is_about_to_death_cross(macdhist, strict=True):
     return True
 
 
-def is_about_to_golden_cross(macdhist, strict=True):
+def is_about_to_golden_cross(macdhist, strict=False):
     """Check whether is going to be golden cross."""
     if len(macdhist) < 1 or macdhist[-1] > 0:
         return False
@@ -64,9 +67,10 @@ def is_about_to_golden_cross(macdhist, strict=True):
     return True
 
 
-def is_about_to_top_divergence(macd, macdsignal, macdhist, strict=True):
+def is_about_to_top_divergence(macd, macdsignal, macdhist, strict=False):
     """Check whether is going to be top divergence."""
-    if not is_about_to_death_cross(macdhist, strict):
+    if not is_positive(macd, macdsignal, strict) or \
+            not is_about_to_death_cross(macdhist, strict):
         return False
 
     idx_negative = numpy.where(macdhist <= 0)[0]
@@ -86,9 +90,10 @@ def is_about_to_top_divergence(macd, macdsignal, macdhist, strict=True):
     return macdsignal[idx_death_cross] >= macdsignal[-1]
 
 
-def is_about_to_bottom_divergence(macd, macdsignal, macdhist, strict=True):
+def is_about_to_bottom_divergence(macd, macdsignal, macdhist, strict=False):
     """Check whether is going to be bottom divergence."""
-    if not is_about_to_golden_cross(macdhist, strict):
+    if not is_negative(macd, macdsignal, strict) or \
+            not is_about_to_golden_cross(macdhist, strict):
         return False
 
     idx_positive = numpy.where(macdhist >= 0)[0]

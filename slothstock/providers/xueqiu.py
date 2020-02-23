@@ -10,48 +10,17 @@ Email: i(at)huxuan.org
 from datetime import datetime
 from datetime import timedelta
 
-from faker import Faker
 import pandas
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
-from .. import constants
-from .. import exceptions
+from slothstock import constants
+from slothstock import exceptions
+from slothstock import utils
 
-XUEQIU_INDEX_URL = 'https://xueqiu.com/'
+XUEQIU_ETF_LIST_URL = 'https://xueqiu.com/service/v5/stock/screener/fund/list'
 XUEQIU_KLINE_URL = 'https://stock.xueqiu.com/v5/stock/chart/kline.json'
 XUEQIU_LIST_URL = 'https://xueqiu.com/service/v5/stock/screener/quote/list'
-XUEQIU_ETF_LIST_URL = 'https://xueqiu.com/service/v5/stock/screener/fund/list'
-
-
-def create_fake_session(index_url=None):
-    """Create fake seesion."""
-    session = requests.Session()
-    session.headers[constants.HEADER_USER_AGENT] = Faker().internet_explorer()
-    if index_url:  # Browser index page for cookies.
-        requests_retry_session(session).get(index_url)
-    return session
-
-
-def requests_retry_session(
-        session=None,
-        retries=3,
-        backoff_factor=0.3,
-        status_forcelist=(500, 502, 504)):
-    """Send requests with retry."""
-    session = session or requests.Session()
-    retry = Retry(
-        total=retries,
-        read=retries,
-        connect=retries,
-        backoff_factor=backoff_factor,
-        status_forcelist=status_forcelist,
-    )
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
-    return session
+XUEQIU_QUOTE_URL = 'https://xueqiu.com/service/v5/stock/batch/quote'
+XUEQIU_URL = 'https://xueqiu.com/'
 
 
 def symbol_transform(symbol):
@@ -104,7 +73,7 @@ def check_response(res):
 class MetaXueQiu(type):
     """Metaclass for XueQiu."""
 
-    session = create_fake_session(XUEQIU_INDEX_URL)
+    session = utils.create_fake_session(XUEQIU_URL)
 
     @classmethod
     def kline(cls, symbol, period='day', begin=None, count=142):
@@ -117,7 +86,7 @@ class MetaXueQiu(type):
             'symbol': symbol_transform(symbol),
             'type': 'before',
         }
-        res = requests_retry_session(cls.session).get(
+        res = utils.requests_retry_session(cls.session).get(
             XUEQIU_KLINE_URL, params=params)
         res = check_response(res)
 
@@ -140,7 +109,7 @@ class MetaXueQiu(type):
             'size': params.get('size', 4000),
             'type': params.get('type', 'sh_sz'),
         })
-        res = requests_retry_session(cls.session).get(url, params=params)
+        res = utils.requests_retry_session(cls.session).get(url, params=params)
         res = check_response(res)
 
         data = pandas.DataFrame(res['data']['list'])
@@ -163,6 +132,42 @@ class MetaXueQiu(type):
             'type': 18,
         })
         return cls.list(XUEQIU_ETF_LIST_URL, **params)
+
+    @classmethod
+    def list_index(cls, indexes=None):
+        """List Index."""
+        url = XUEQIU_QUOTE_URL
+        indexes = indexes or [symbol_transform(index)
+                              for index in constants.STOCK_INDEX]
+        params = {
+            '_': datetime_to_timestamp(),
+            'symbol': ','.join(indexes or constants.STOCK_INDEX),
+        }
+        res = utils.requests_retry_session(cls.session).get(url, params=params)
+        res = check_response(res)
+
+        data = pandas.DataFrame([
+            item['quote'] for item in res['data'].get('items', [])
+        ])
+        data.symbol = data.symbol.apply(symbol_restore)
+        data.set_index('symbol', inplace=True)
+        return data
+
+    @classmethod
+    def list_stocks(cls, ebk=None):
+        """List stocks."""
+        stocks_ashare = XueQiu.list_ashare()
+        stocks_etf = XueQiu.list_etf()
+        stocks_index = XueQiu.list_index()
+        stocks = pandas.concat([stocks_ashare, stocks_etf, stocks_index])
+
+        if ebk:
+            res = set()
+            for filename in ebk:
+                res.update(utils.import_ebk(filename))
+            stocks = stocks[stocks.index.isin(res)]
+
+        return stocks
 
 
 class XueQiu(metaclass=MetaXueQiu):  # pylint: disable=too-few-public-methods

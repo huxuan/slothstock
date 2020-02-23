@@ -12,51 +12,24 @@ from datetime import datetime
 from datetime import timedelta
 import time
 
-import numpy
-import pandas
 from tqdm import tqdm
 
-from slothstock import __version__
 from slothstock import constants
 from slothstock import exceptions
+from slothstock import parsers
 from slothstock import utils
 from slothstock.indicators import macd_indicator
-from slothstock.providers.xueqiu import XueQiu
+from slothstock.providers import XueQiu
 
 
 def parse_args():
     """Argument Parser."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--token')
-    parser.add_argument('--reserve-st', action='store_false')
-    parser.add_argument('--reserve-suspend', action='store_false')
-    parser.add_argument('--topic-ids', action='append', default=[])
-    parser.add_argument('--uids', action='append', default=[])
-    parser.add_argument('-d', '--daemon', action='store_true')
-    parser.add_argument('-e', '--ebk', action='append', default=[])
-    parser.add_argument('-i', '--interval', default=0.1, type=float)
-    parser.add_argument('-o', '--output', default='sloth.ebk')
-    parser.add_argument('-p', '--period', default='day')
-    parser.add_argument('-s', '--strict', action='store_true')
-    parser.add_argument('-t', '--title')
-    parser.add_argument('-v', '--version', action='version',
-                        version=__version__)
+    parser = argparse.ArgumentParser(parents=[
+        parsers.MISC_PARSER,
+        parsers.SLOTHSTOCK_PARSER,
+        parsers.WXPUSHER_PARSER,
+    ])
     return parser.parse_args()
-
-
-def load_stocks(ebk):
-    """Load symbols."""
-    stocks_ashare = XueQiu.list_ashare()
-    stocks_etf = XueQiu.list_etf()
-    stocks = pandas.concat([stocks_ashare, stocks_etf], sort=False)
-
-    if ebk:
-        res = set()
-        for filename in ebk:
-            res.update(utils.import_ebk(filename))
-        stocks = stocks[stocks.index.isin(res)]
-
-    return stocks
 
 
 def check_buy(stocks, args):
@@ -70,22 +43,20 @@ def check_buy(stocks, args):
         pbar.set_description(symbol)
 
         # Whether to reserve ST stocks.
-        if args.reserve_st and 'name' in stocks.columns and \
-                'ST' in stocks.loc[symbol, 'name']:
+        if args.reserve_st and utils.is_st(stocks.loc[symbol]):
             continue
 
         # Whether to reserve suspended stocks.
-        if args.reserve_suspend and 'volume' in stocks.columns and \
-                numpy.isnan(stocks.loc[symbol, 'volume']):
+        if args.reserve_suspend and utils.is_suspend(stocks.loc[symbol]):
             continue
 
         # Check great-great-grandparent period.
-        if args.strict:
+        if args.great_great_grandparent_period:
             time.sleep(args.interval)
             period_cur = constants.PERIODS[idx + 4]
             kline = XueQiu.kline(symbol, period_cur)
             _, _, macdhist = macd_indicator.clean_macd(kline.close)
-            if not macd_indicator.is_expand_golden_cross(macdhist):
+            if not macd_indicator.is_golden_cross(macdhist, args.strict):
                 continue
 
         # Check grandparent period.
@@ -93,7 +64,7 @@ def check_buy(stocks, args):
         period_cur = constants.PERIODS[idx + 2]
         kline = XueQiu.kline(symbol, period_cur)
         _, _, macdhist = macd_indicator.clean_macd(kline.close)
-        if not macd_indicator.is_expand_golden_cross(macdhist):
+        if not macd_indicator.is_golden_cross(macdhist, args.strict):
             continue
 
         # Check current period.
@@ -106,13 +77,11 @@ def check_buy(stocks, args):
             continue
 
         # Check child period.
-        if args.strict:
+        if args.child_period:
             time.sleep(args.interval)
             period_cur = constants.PERIODS[idx - 1]
             kline = XueQiu.kline(symbol, period_cur)
             macd, macdsignal, macdhist = macd_indicator.clean_macd(kline.close)
-            if not macd_indicator.is_negative(macd, macdsignal, args.strict):
-                continue
             if not macd_indicator.is_about_to_bottom_divergence(
                     macd, macdsignal, macd_indicator, args.strict):
                 continue
@@ -128,7 +97,7 @@ def main():
     if args.period not in constants.PERIODS_VALID:
         raise exceptions.InvalidPeriodError()
 
-    stocks = load_stocks(args.ebk)
+    stocks = XueQiu.list_stocks(args.ebk)
     stocks = check_buy(stocks, args)
 
     utils.export_ebk(stocks.index, args.output)

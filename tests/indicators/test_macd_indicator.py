@@ -11,7 +11,7 @@ from datetime import datetime
 import unittest
 
 from slothstock.indicators import macd_indicator
-from slothstock.providers.xueqiu import XueQiu
+from slothstock.providers import XueQiu
 
 
 class TestMACD(unittest.TestCase):
@@ -33,8 +33,8 @@ class TestMACD(unittest.TestCase):
         self.assertTrue(macd_indicator.is_about_to_bottom_divergence(
             macd, macdsignal, macdhist))
 
-    def test_is_expand_golden_cross(self):
+    def test_is_golden_cross(self):
         """Positive case for expand golden cross."""
         res = XueQiu.kline('000001.SH', 'day', '2020-01-03 00:00')
         _, _, macdhist = macd_indicator.clean_macd(res.close)
-        self.assertTrue(macd_indicator.is_expand_golden_cross(macdhist))
+        self.assertTrue(macd_indicator.is_golden_cross(macdhist))

@@ -12,11 +12,15 @@ import tempfile
 import unittest
 
 from slothstock import utils
-from slothstock.providers.xueqiu import XueQiu
+from slothstock.providers import XueQiu
 
 
 class TestUtils(unittest.TestCase):
     """Unittests for utils."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.stocks = XueQiu.list_stocks()
 
     def test_import_export_ebk(self):
         """Positive case for import & export ebk."""
@@ -28,3 +32,15 @@ class TestUtils(unittest.TestCase):
         symbols = utils.import_ebk(temp_file.name)
         for symbol in symbols:
             self.assertIn(symbol, stocks.index)
+
+    def test_is_st(self):
+        """Cases to check whether is ST."""
+        self.assertTrue(utils.is_st(self.stocks.loc['600518.SH']))
+        self.assertFalse(utils.is_st(self.stocks.loc['000001.SZ']))
+
+    def test_is_suspend(self):
+        """Cases to check whether is suspended."""
+        self.assertTrue(utils.is_suspend(self.stocks.loc['000029.SZ']))
+        self.assertFalse(utils.is_suspend(self.stocks.loc['000001.SZ']))
+        self.assertFalse(utils.is_suspend(self.stocks.loc['000001.SH']))
+        self.assertFalse(utils.is_suspend(self.stocks.loc['510050.SH']))

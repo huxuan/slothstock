@@ -12,7 +12,7 @@ import unittest
 
 import pandas
 
-from slothstock.providers.xueqiu import XueQiu
+from slothstock.providers import XueQiu
 
 
 class TestXueQiu(unittest.TestCase):
@@ -42,3 +42,9 @@ class TestXueQiu(unittest.TestCase):
         res = XueQiu.list_etf()
         self.assertIsInstance(res, pandas.DataFrame)
         self.assertGreater(len(res.index), 0)
+
+    def test_list_index(self):
+        """Positive case for list_index."""
+        res = XueQiu.list_index()
+        self.assertIsInstance(res, pandas.DataFrame)
+        self.assertEqual(len(res.index), 4)

@@ -7,8 +7,13 @@ File: utils.py
 Author: huxuan
 Email: i(at)huxuan.org
 """
-
+from faker import Faker
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from wxpusher import WxPusher
+
+from slothstock import constants
 
 
 def export_ebk(symbols, filename='sloth.ebk'):
@@ -46,3 +51,42 @@ def send_notification(content, token, topic_ids, uids):
     if not uids and not topic_ids:
         return
     WxPusher.send_message(content, uids=uids, topic_ids=topic_ids, token=token)
+
+
+def is_st(stock):
+    """Check whether it is ST."""
+    return 'ST' in stock.get('name')
+
+
+def is_suspend(stock):
+    """Check whether it is suspended."""
+    return stock.get('volume') == 0
+
+
+def create_fake_session(index_url=None):
+    """Create fake seesion."""
+    session = requests.Session()
+    session.headers[constants.HEADER_USER_AGENT] = Faker().internet_explorer()
+    if index_url:  # Browser index page for cookies.
+        requests_retry_session(session).get(index_url)
+    return session
+
+
+def requests_retry_session(
+        session=None,
+        retries=3,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 504)):
+    """Send requests with retry."""
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
