@@ -23,8 +23,8 @@ MISC_GROUP.add_argument('-v', '--version', action='version',
 # SlothStock
 SLOTHSTOCK_PARSER = argparse.ArgumentParser(add_help=False)
 SLOTHSTOCK_GROUP = SLOTHSTOCK_PARSER.add_argument_group('slothstock')
-SLOTHSTOCK_GROUP.add_argument('--reserve-st', action='store_false')
-SLOTHSTOCK_GROUP.add_argument('--reserve-suspend', action='store_false')
+SLOTHSTOCK_GROUP.add_argument('--reserve-st', action='store_true')
+SLOTHSTOCK_GROUP.add_argument('--reserve-suspend', action='store_true')
 SLOTHSTOCK_GROUP.add_argument('-c', '--child-period', action='store_true')
 SLOTHSTOCK_GROUP.add_argument('-e', '--ebk', action='append', default=[])
 SLOTHSTOCK_GROUP.add_argument('-g', '--great-great-grandparent-period',

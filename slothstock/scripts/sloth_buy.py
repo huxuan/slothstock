@@ -43,11 +43,11 @@ def check_buy(stocks, args):
         pbar.set_description(symbol)
 
         # Whether to reserve ST stocks.
-        if args.reserve_st and utils.is_st(stocks.loc[symbol]):
+        if not args.reserve_st and utils.is_st(stocks.loc[symbol]):
             continue
 
         # Whether to reserve suspended stocks.
-        if args.reserve_suspend and utils.is_suspend(stocks.loc[symbol]):
+        if not args.reserve_suspend and utils.is_suspend(stocks.loc[symbol]):
             continue
 
         # Check great-great-grandparent period.

@@ -41,6 +41,14 @@ class TestUtils(unittest.TestCase):
     def test_is_suspend(self):
         """Cases to check whether is suspended."""
         self.assertTrue(utils.is_suspend(self.stocks.loc['000029.SZ']))
-        self.assertFalse(utils.is_suspend(self.stocks.loc['000001.SZ']))
+        self.assertTrue(utils.is_suspend(self.stocks.loc['002450.SZ']))
+        self.assertTrue(utils.is_suspend(self.stocks.loc['300104.SZ']))
+        self.assertTrue(utils.is_suspend(self.stocks.loc['600145.SH']))
+
         self.assertFalse(utils.is_suspend(self.stocks.loc['000001.SH']))
         self.assertFalse(utils.is_suspend(self.stocks.loc['510050.SH']))
+        self.assertFalse(utils.is_suspend(self.stocks.loc['600519.SH']))
+
+        self.assertFalse(utils.is_suspend(self.stocks.loc['000001.SZ']))
+        self.assertFalse(utils.is_suspend(self.stocks.loc['159949.SZ']))
+        self.assertFalse(utils.is_suspend(self.stocks.loc['399001.SZ']))

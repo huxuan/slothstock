@@ -8,6 +8,7 @@ Author: huxuan
 Email: i(at)huxuan.org
 """
 from faker import Faker
+import numpy
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -60,7 +61,7 @@ def is_st(stock):
 
 def is_suspend(stock):
     """Check whether it is suspended."""
-    return stock.get('volume') == 0
+    return stock.get('type') == 11 and numpy.isnan(stock.get('amplitude'))
 
 
 def create_fake_session(index_url=None):
