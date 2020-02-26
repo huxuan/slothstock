@@ -13,9 +13,9 @@ from datetime import timedelta
 import time
 
 from tqdm import tqdm
+from wxpusher import WxPusher
 
 from slothstock import constants
-from slothstock import exceptions
 from slothstock import parsers
 from slothstock import utils
 from slothstock.indicators import macd_indicator
@@ -51,7 +51,8 @@ def check_buy(stocks, args):
             continue
 
         # Check great-great-grandparent period.
-        if args.great_great_grandparent_period:
+        if idx + 4 < len(constants.PERIODS) and \
+                args.great_great_grandparent_period:
             time.sleep(args.interval)
             period_cur = constants.PERIODS[idx + 4]
             kline = XueQiu.kline(symbol, period_cur)
@@ -60,12 +61,13 @@ def check_buy(stocks, args):
                 continue
 
         # Check grandparent period.
-        time.sleep(args.interval)
-        period_cur = constants.PERIODS[idx + 2]
-        kline = XueQiu.kline(symbol, period_cur)
-        _, _, macdhist = macd_indicator.clean_macd(kline.close)
-        if not macd_indicator.is_golden_cross(macdhist, args.strict):
-            continue
+        if idx + 2 < len(constants.PERIODS):
+            time.sleep(args.interval)
+            period_cur = constants.PERIODS[idx + 2]
+            kline = XueQiu.kline(symbol, period_cur)
+            _, _, macdhist = macd_indicator.clean_macd(kline.close)
+            if not macd_indicator.is_golden_cross(macdhist, args.strict):
+                continue
 
         # Check current period.
         time.sleep(args.interval)
@@ -77,7 +79,7 @@ def check_buy(stocks, args):
             continue
 
         # Check child period.
-        if args.child_period:
+        if idx > 0 and args.child_period:
             time.sleep(args.interval)
             period_cur = constants.PERIODS[idx - 1]
             kline = XueQiu.kline(symbol, period_cur)
@@ -90,33 +92,50 @@ def check_buy(stocks, args):
     return stocks[stocks.index.isin(res)].sort_index()
 
 
+def show_result(stocks, args):
+    """Show results."""
+    # Return for empty result when set to ignore empty.
+    if args.ignore_empty and stocks.index.empty:
+        return
+
+    # Output a file when output is set.
+    if args.output:
+        utils.export_ebk(stocks.index, args.output)
+
+    # Send notification if token and (uids or topic_ids) is set.
+    if args.token and (args.uids or args.topic_ids):
+
+        # Format title.
+        title = args.title
+        if not title:
+            title = f'{args.period}级别可能买点'
+            if stocks.index.empty:
+                title = f'{args.period}级别无可能买点'
+
+        # Organize content for notification.
+        content = [title]
+        content.extend([
+            f'{symbol} {stocks.loc[symbol, "name"]}'
+            for symbol in stocks.index
+        ])
+        content.append(str(datetime.utcnow() + timedelta(hours=8)))
+        content = '\n'.join(content)
+        WxPusher.send_message(content,
+                              uids=args.uids,
+                              topic_ids=args.topic_ids,
+                              token=args.token)
+
+        # Print the result on console.
+        print(content)
+
+
 def main():
     """Indicate buy signals."""
     args = parse_args()
 
-    if args.period not in constants.PERIODS_VALID:
-        raise exceptions.InvalidPeriodError()
-
     stocks = XueQiu.list_stocks(args.ebk)
     stocks = check_buy(stocks, args)
-
-    utils.export_ebk(stocks.index, args.output)
-
-    title = args.title
-    if not title:
-        title = f'{args.period}级别可能买点'
-        if stocks.index.empty:
-            title = f'{args.period}级别无可能买点'
-
-    content = [title]
-    content.extend([
-        f'{symbol} {stocks.loc[symbol, "name"]}'
-        for symbol in stocks.index
-    ])
-    content.append(str(datetime.utcnow() + timedelta(hours=8)))
-    content = '\n'.join(content)
-    print(content)
-    utils.send_notification(content, args.token, args.topic_ids, args.uids)
+    show_result(stocks, args)
 
 
 if __name__ == '__main__':

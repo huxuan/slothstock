@@ -13,29 +13,29 @@ from slothstock import __version__
 
 # MISC
 MISC_PARSER = argparse.ArgumentParser(add_help=False)
-MISC_GROUP = MISC_PARSER.add_argument_group('misc')
-MISC_GROUP.add_argument('-d', '--daemon', action='store_true')
-MISC_GROUP.add_argument('-i', '--interval', default=0.1, type=float)
-MISC_GROUP.add_argument('-o', '--output', default='sloth.ebk')
-MISC_GROUP.add_argument('-v', '--version', action='version',
-                        version=__version__)
+MISC_PARSER.add_argument('--daemon', action='store_true')
+MISC_PARSER.add_argument('--interval', default=0.1, type=float)
+MISC_PARSER.add_argument('--ignore-empty', action='store_true')
+MISC_PARSER.add_argument('--output')
+MISC_PARSER.add_argument('-V', '--version', action='version',
+                         version=__version__)
 
 # SlothStock
 SLOTHSTOCK_PARSER = argparse.ArgumentParser(add_help=False)
-SLOTHSTOCK_GROUP = SLOTHSTOCK_PARSER.add_argument_group('slothstock')
+SLOTHSTOCK_GROUP = SLOTHSTOCK_PARSER.add_argument_group('SlothStock')
+SLOTHSTOCK_GROUP.add_argument('--ebk', action='append', default=[])
+SLOTHSTOCK_GROUP.add_argument('--period', default='day')
 SLOTHSTOCK_GROUP.add_argument('--reserve-st', action='store_true')
 SLOTHSTOCK_GROUP.add_argument('--reserve-suspend', action='store_true')
-SLOTHSTOCK_GROUP.add_argument('-c', '--child-period', action='store_true')
-SLOTHSTOCK_GROUP.add_argument('-e', '--ebk', action='append', default=[])
-SLOTHSTOCK_GROUP.add_argument('-g', '--great-great-grandparent-period',
+SLOTHSTOCK_GROUP.add_argument('--strict', action='store_true')
+SLOTHSTOCK_GROUP.add_argument('-C', '--child-period', action='store_true')
+SLOTHSTOCK_GROUP.add_argument('-G', '--great-great-grandparent-period',
                               action='store_true')
-SLOTHSTOCK_GROUP.add_argument('-p', '--period', default='day')
-SLOTHSTOCK_GROUP.add_argument('-s', '--strict', action='store_true')
 
 # WxPusher
 WXPUSHER_PARSER = argparse.ArgumentParser(add_help=False)
-WXPUSHER_GROUP = WXPUSHER_PARSER.add_argument_group('wxpusher')
+WXPUSHER_GROUP = WXPUSHER_PARSER.add_argument_group('WxPusher')
+WXPUSHER_GROUP.add_argument('--title')
 WXPUSHER_GROUP.add_argument('--token')
 WXPUSHER_GROUP.add_argument('--topic-ids', action="append", default=[])
 WXPUSHER_GROUP.add_argument('--uids', action='append', default=[])
-WXPUSHER_GROUP.add_argument('-t', '--title')

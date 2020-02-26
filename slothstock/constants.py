@@ -22,7 +22,6 @@ PERIODS = [
     'quarter',
     'year',
 ]
-PERIODS_VALID = PERIODS[1:5]
 STOCK_INDEX = {
     '000001.SH',
     '000300.SH',

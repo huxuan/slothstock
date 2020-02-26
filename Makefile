@@ -1,6 +1,6 @@
 .PHONY: clean install dev flake8 pylint lint dist upload uploadtest test
 
-PKG := slothstock
+PKG := $(shell basename $(CURDIR) | cut -d- -f1)
 PIPRUN := $(shell command -v pipenv > /dev/null && echo pipenv run)
 
 clean:
@@ -29,10 +29,10 @@ flake8:
 	${PIPRUN} flake8 \
 		--import-order-style google \
 		--application-import-names ${PKG} \
-		setup.py ${PKG}
+		setup.py tests ${PKG}
 
 pylint:
-	${PIPRUN} pylint setup.py ${PKG}
+	${PIPRUN} pylint setup.py tests ${PKG}
 
 lint: dev flake8 pylint
 

@@ -17,10 +17,6 @@ class InvalidDatetimeError(BaseCustomException):
     """Raised for invalid datetime."""
 
 
-class InvalidPeriodError(BaseCustomException):
-    """Raised for invalid period."""
-
-
 class InvalidResultError(BaseCustomException):
     """Raised when the result can not be parsed."""
 

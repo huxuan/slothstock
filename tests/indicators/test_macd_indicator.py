@@ -73,3 +73,12 @@ class TestMACD(unittest.TestCase):
         self.assertTrue(is_about_to_death_cross(macdhist, True))
         self.assertTrue(is_about_to_death_cross(macdhist[:-1]))
         self.assertFalse(is_about_to_death_cross(macdhist[:-1], True))
+
+    def test_is_about_golden_cross(self):
+        """Test is_about_to_golden_cross() with strict."""
+        res = XueQiu.kline('000001.SH', 'day', datetime(2020, 2, 6))
+        _, _, macdhist = clean_macd(res.close)
+        self.assertTrue(is_about_to_golden_cross(macdhist))
+        self.assertTrue(is_about_to_golden_cross(macdhist, True))
+        self.assertTrue(is_about_to_golden_cross(macdhist[:-1]))
+        self.assertFalse(is_about_to_golden_cross(macdhist[:-1], True))

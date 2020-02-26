@@ -20,6 +20,7 @@ class TestUtils(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """Set up for class."""
         cls.stocks = XueQiu.list_stocks()
 
     def test_import_export_ebk(self):

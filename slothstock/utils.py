@@ -12,7 +12,6 @@ import numpy
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from wxpusher import WxPusher
 
 from slothstock import constants
 
@@ -43,15 +42,6 @@ def import_ebk(filename):
             else:
                 res.append(f'{line[1:]}.SZ')
     return res
-
-
-def send_notification(content, token, topic_ids, uids):
-    """Send notification."""
-    if not token:
-        return
-    if not uids and not topic_ids:
-        return
-    WxPusher.send_message(content, uids=uids, topic_ids=topic_ids, token=token)
 
 
 def is_st(stock):
