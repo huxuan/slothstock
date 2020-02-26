@@ -22,23 +22,34 @@ pip install -U slothstock
 ```shell
 $ sloth-buy -h
 
-usage: sloth-buy [-h] [--token TOKEN] [--filter-st] [--filter-suspend]
-                 [--topic-ids TOPIC_IDS] [--uids UIDS] [-e EBK] [-i INTERVAL]
-                 [-o OUTPUT] [-p PERIOD] [-s] [-v]
+usage: sloth-buy [-h] [--daemon] [--interval INTERVAL] [--ignore-empty]
+                 [--output OUTPUT] [-V] [--ebk EBK] [--period PERIOD]
+                 [--reserve-st] [--reserve-suspend] [--strict] [-C] [-G]
+                 [--title TITLE] [--token TOKEN] [--topic-ids TOPIC_IDS]
+                 [--uids UIDS]
 
 optional arguments:
   -h, --help            show this help message and exit
+  --daemon
+  --interval INTERVAL
+  --ignore-empty
+  --output OUTPUT
+  -V, --version         show program's version number and exit
+
+SlothStock:
+  --ebk EBK
+  --period PERIOD
+  --reserve-st
+  --reserve-suspend
+  --strict
+  -C, --child-period
+  -G, --great-great-grandparent-period
+
+WxPusher:
+  --title TITLE
   --token TOKEN
-  --filter-st
-  --filter-suspend
   --topic-ids TOPIC_IDS
   --uids UIDS
-  -e EBK, --ebk EBK
-  -i INTERVAL, --interval INTERVAL
-  -o OUTPUT, --output OUTPUT
-  -p PERIOD, --period PERIOD
-  -s, --strict
-  -v, --version         show program's version number and exit
 ```
 
 ## 运行测试
