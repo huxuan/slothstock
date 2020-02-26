@@ -52,6 +52,35 @@ WxPusher:
   --uids UIDS
 ```
 
+```shell
+$ sloth-sell -h
+
+usage: sloth-sell [-h] [--daemon] [--interval INTERVAL] [--ignore-empty]
+                  [--output OUTPUT] [-V] [--ebk EBK] [--period PERIOD]
+                  [--strict] [-C] [--title TITLE] [--token TOKEN]
+                  [--topic-ids TOPIC_IDS] [--uids UIDS]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --daemon
+  --interval INTERVAL
+  --ignore-empty
+  --output OUTPUT
+  -V, --version         show program's version number and exit
+
+SlothStock:
+  --ebk EBK
+  --period PERIOD
+  --strict
+  -C, --child-period
+
+WxPusher:
+  --title TITLE
+  --token TOKEN
+  --topic-ids TOPIC_IDS
+  --uids UIDS
+```
+
 ## Running the tests
 
 ```shell
