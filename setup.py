@@ -76,6 +76,7 @@ setup(name=NAME,
       entry_points={
           'console_scripts': [
               'sloth-buy=slothstock.scripts.sloth_buy:main',
+              'sloth-sell=slothstock.scripts.sloth_sell:main',
           ],
       },
       include_package_data=True)

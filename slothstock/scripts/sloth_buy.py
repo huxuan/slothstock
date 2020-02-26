@@ -8,23 +8,22 @@ Author: huxuan
 Email: i(at)huxuan.org
 """
 import argparse
-from datetime import datetime
-from datetime import timedelta
 import time
 
 from tqdm import tqdm
-from wxpusher import WxPusher
 
 from slothstock import constants
-from slothstock import parsers
 from slothstock import utils
 from slothstock.indicators import macd_indicator
 from slothstock.providers import XueQiu
+from slothstock.scripts import common
+from slothstock.scripts import parsers
 
 
 def parse_args():
     """Argument Parser."""
     parser = argparse.ArgumentParser(parents=[
+        parsers.BUY_PARSER,
         parsers.MISC_PARSER,
         parsers.SLOTHSTOCK_PARSER,
         parsers.WXPUSHER_PARSER,
@@ -34,9 +33,9 @@ def parse_args():
 
 def check_buy(stocks, args):
     """Check buy signals."""
-    res = set()
-    idx = constants.PERIODS.index(args.period)
     symbols = stocks.sample(frac=1).index
+    idx = constants.PERIODS.index(args.period)
+    candidate_buy = set()
 
     pbar = tqdm(symbols, disable=args.daemon)
     for symbol in pbar:
@@ -88,45 +87,8 @@ def check_buy(stocks, args):
                     macd, macdsignal, macd_indicator, args.strict):
                 continue
 
-        res.add(symbol)
-    return stocks[stocks.index.isin(res)].sort_index()
-
-
-def show_result(stocks, args):
-    """Show results."""
-    # Return for empty result when set to ignore empty.
-    if args.ignore_empty and stocks.index.empty:
-        return
-
-    # Output a file when output is set.
-    if args.output:
-        utils.export_ebk(stocks.index, args.output)
-
-    # Send notification if token and (uids or topic_ids) is set.
-    if args.token and (args.uids or args.topic_ids):
-
-        # Format title.
-        title = args.title
-        if not title:
-            title = f'{args.period}级别可能买点'
-            if stocks.index.empty:
-                title = f'{args.period}级别无可能买点'
-
-        # Organize content for notification.
-        content = [title]
-        content.extend([
-            f'{symbol} {stocks.loc[symbol, "name"]}'
-            for symbol in stocks.index
-        ])
-        content.append(str(datetime.utcnow() + timedelta(hours=8)))
-        content = '\n'.join(content)
-        WxPusher.send_message(content,
-                              uids=args.uids,
-                              topic_ids=args.topic_ids,
-                              token=args.token)
-
-        # Print the result on console.
-        print(content)
+        candidate_buy.add(symbol)
+    return stocks[stocks.index.isin(candidate_buy)].sort_index()
 
 
 def main():
@@ -135,7 +97,7 @@ def main():
 
     stocks = XueQiu.list_stocks(args.ebk)
     stocks = check_buy(stocks, args)
-    show_result(stocks, args)
+    common.show_result(stocks, '买', args)
 
 
 if __name__ == '__main__':

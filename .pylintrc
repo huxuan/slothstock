@@ -1,2 +1,6 @@
 [MASTER]
 ignored-modules=talib
+
+[SIMILARITIES]
+ignore-imports=yes
+min-similarity-lines=6
