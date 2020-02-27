@@ -21,56 +21,64 @@ def clean_macd(closes, fastperiod=12, slowperiod=26, signalperiod=9):
     return macd, macdsignal, macdhist
 
 
-def is_golden_cross(macdhist, strict=False):
-    """Check whether the macd is golden cross."""
-    if len(macdhist) < 1 or macdhist[-1] < 0:
-        return False
-    if strict:
-        if len(macdhist) < 2 or macdhist[-1] < macdhist[-2]:
-            return False
-    return True
-
-
-def is_negative(macd, macdsignal, strict=False):
+def is_negative(macd, macdsignal, loose=False):
     """Check whether the macd is negative."""
     if len(macd) < 1:
         return False
-    if strict:
+    if not loose:
         return macd[-1] <= 0 and macdsignal[-1] <= 0
     return macd[-1] <= 0 or macdsignal[-1] <= 0
 
 
-def is_positive(macd, macdsignal, strict=False):
+def is_positive(macd, macdsignal, loose=False):
     """Check whether the macd is positive."""
     if len(macd) < 1:
         return False
-    if strict:
+    if not loose:
         return macd[-1] >= 0 and macdsignal[-1] >= 0
     return macd[-1] >= 0 or macdsignal[-1] >= 0
 
 
-def is_about_to_death_cross(macdhist, strict=False):
-    """Check whether is going to be death cross."""
-    if len(macdhist) < 1 or macdhist[-1] < 0:
+def is_death_cross(macdhist, loose=False):
+    """Check whether the macd is death cross."""
+    if len(macdhist) < 1 or macdhist[-1] > 0:
         return False
-    if strict:
+    if not loose:
         return len(macdhist) > 1 and macdhist[-2] >= macdhist[-1]
     return True
 
 
-def is_about_to_golden_cross(macdhist, strict=False):
-    """Check whether is going to be golden cross."""
-    if len(macdhist) < 1 or macdhist[-1] > 0:
+def is_golden_cross(macdhist, loose=False):
+    """Check whether the macd is golden cross."""
+    if len(macdhist) < 1 or macdhist[-1] < 0:
         return False
-    if strict:
+    if not loose:
         return len(macdhist) > 1 and macdhist[-2] <= macdhist[-1]
     return True
 
 
-def is_about_to_top_divergence(macd, macdsignal, macdhist, strict=False):
+def is_about_to_death_cross(macdhist, loose=False):
+    """Check whether is going to be death cross."""
+    if len(macdhist) < 1 or macdhist[-1] < 0:
+        return False
+    if not loose:
+        return len(macdhist) > 1 and macdhist[-2] >= macdhist[-1]
+    return True
+
+
+def is_about_to_golden_cross(macdhist, loose=False):
+    """Check whether is going to be golden cross."""
+    if len(macdhist) < 1 or macdhist[-1] > 0:
+        return False
+    if not loose:
+        return len(macdhist) > 1 and macdhist[-2] <= macdhist[-1]
+    return True
+
+
+def is_about_to_top_divergence(macd, macdsignal, macdhist, loose=False):
     """Check whether is going to be top divergence."""
-    if not is_positive(macd, macdsignal, strict) or \
-            not is_about_to_death_cross(macdhist, strict):
+    if not is_positive(macd, macdsignal, loose) or \
+            not is_about_to_death_cross(macdhist, loose):
         return False
 
     idx_negative = numpy.where(macdhist <= 0)[0]
@@ -83,17 +91,17 @@ def is_about_to_top_divergence(macd, macdsignal, macdhist, strict=False):
         return False
     idx_death_cross = idx_positive[-1]
 
-    if strict and any(macd[idx_death_cross:] < 0):
+    if not loose and any(macd[idx_death_cross:] < 0):
         return False
     if any(macdsignal[idx_death_cross:] < 0):
         return False
     return macdsignal[idx_death_cross] >= macdsignal[-1]
 
 
-def is_about_to_bottom_divergence(macd, macdsignal, macdhist, strict=False):
+def is_about_to_bottom_divergence(macd, macdsignal, macdhist, loose=False):
     """Check whether is going to be bottom divergence."""
-    if not is_negative(macd, macdsignal, strict) or \
-            not is_about_to_golden_cross(macdhist, strict):
+    if not is_negative(macd, macdsignal, loose) or \
+            not is_about_to_golden_cross(macdhist, loose):
         return False
 
     idx_positive = numpy.where(macdhist >= 0)[0]
@@ -106,7 +114,7 @@ def is_about_to_bottom_divergence(macd, macdsignal, macdhist, strict=False):
         return False
     idx_golden_cross = idx_negative[-1]
 
-    if strict and any(macd[idx_golden_cross:] > 0):
+    if not loose and any(macd[idx_golden_cross:] > 0):
         return False
     if any(macdsignal[idx_golden_cross:] > 0):
         return False

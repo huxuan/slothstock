@@ -43,17 +43,17 @@ def check_sell(stocks, args):
         time.sleep(args.interval)
         kline = XueQiu.kline(symbol, args.period)
         _, _, macdhist = macd_indicator.clean_macd(kline.close)
-        if not macd_indicator.is_about_to_death_cross(macdhist, args.strict):
+        if not macd_indicator.is_about_to_death_cross(macdhist, args.loose):
             continue
 
         # Check child period.
-        if idx > 0 and args.child_period:
+        if idx > 0 and not args.skip_child:
             time.sleep(args.interval)
             period_cur = constants.PERIODS[idx - 1]
             kline = XueQiu.kline(symbol, period_cur)
-            macd, macdsignal, macdhist = macd_indicator.clean_macd(kline.close)
-            if not macd_indicator.is_about_to_top_divergence(
-                    macd, macdsignal, macd_indicator, args.strict):
+            _, _, macdhist = macd_indicator.clean_macd(kline.close)
+            if not macd_indicator.is_about_to_death_cross(
+                    macdhist, args.loose):
                 continue
 
         candidate_sell.add(symbol)

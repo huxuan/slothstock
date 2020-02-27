@@ -22,9 +22,10 @@ pip install -U slothstock
 ```shell
 $ sloth-buy -h
 
-usage: sloth-buy [-h] [--daemon] [--interval INTERVAL] [--ignore-empty]
-                 [--output OUTPUT] [-V] [--ebk EBK] [--period PERIOD]
-                 [--reserve-st] [--reserve-suspend] [--strict] [-C] [-G]
+usage: sloth-buy [-h] [--reserve-st] [--reserve-suspend]
+                 [--check-great-great-grandparent] [--daemon]
+                 [--interval INTERVAL] [--ignore-empty] [--output OUTPUT] [-V]
+                 [--ebk EBK] [--period PERIOD] [--loose] [--skip-child]
                  [--title TITLE] [--token TOKEN] [--topic-ids TOPIC_IDS]
                  [--uids UIDS]
 
@@ -36,14 +37,16 @@ optional arguments:
   --output OUTPUT
   -V, --version         show program's version number and exit
 
+Buy:
+  --reserve-st
+  --reserve-suspend
+  --check-great-great-grandparent
+
 SlothStock:
   --ebk EBK
   --period PERIOD
-  --reserve-st
-  --reserve-suspend
-  --strict
-  -C, --child-period
-  -G, --great-great-grandparent-period
+  --loose
+  --skip-child
 
 WxPusher:
   --title TITLE
@@ -57,7 +60,7 @@ $ sloth-sell -h
 
 usage: sloth-sell [-h] [--daemon] [--interval INTERVAL] [--ignore-empty]
                   [--output OUTPUT] [-V] [--ebk EBK] [--period PERIOD]
-                  [--strict] [-C] [--title TITLE] [--token TOKEN]
+                  [--loose] [--skip-child] [--title TITLE] [--token TOKEN]
                   [--topic-ids TOPIC_IDS] [--uids UIDS]
 
 optional arguments:
@@ -71,8 +74,8 @@ optional arguments:
 SlothStock:
   --ebk EBK
   --period PERIOD
-  --strict
-  -C, --child-period
+  --loose
+  --skip-child
 
 WxPusher:
   --title TITLE
@@ -96,7 +99,7 @@ tox
 - [x] EBK file import and export.
 - [x] Daemon mode.
 - [x] Buy signal script.
-- [ ] Sell signal script.
+- [x] Sell signal script.
 - [ ] Add cache for frequent fetched data.
 - [ ] logger.
 - [ ] Cronjob guide or something similar.

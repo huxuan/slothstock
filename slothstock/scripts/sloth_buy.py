@@ -51,12 +51,12 @@ def check_buy(stocks, args):
 
         # Check great-great-grandparent period.
         if idx + 4 < len(constants.PERIODS) and \
-                args.great_great_grandparent_period:
+                args.check_great_great_grandparent:
             time.sleep(args.interval)
             period_cur = constants.PERIODS[idx + 4]
             kline = XueQiu.kline(symbol, period_cur)
             _, _, macdhist = macd_indicator.clean_macd(kline.close)
-            if not macd_indicator.is_golden_cross(macdhist, args.strict):
+            if not macd_indicator.is_golden_cross(macdhist, args.loose):
                 continue
 
         # Check grandparent period.
@@ -65,26 +65,26 @@ def check_buy(stocks, args):
             period_cur = constants.PERIODS[idx + 2]
             kline = XueQiu.kline(symbol, period_cur)
             _, _, macdhist = macd_indicator.clean_macd(kline.close)
-            if not macd_indicator.is_golden_cross(macdhist, args.strict):
+            if not macd_indicator.is_golden_cross(macdhist, args.loose):
                 continue
 
         # Check current period.
         time.sleep(args.interval)
         kline = XueQiu.kline(symbol, args.period)
         macd, macdsignal, macdhist = macd_indicator.clean_macd(kline.close)
-        if not macd_indicator.is_negative(macd, macdsignal, args.strict):
+        if not macd_indicator.is_negative(macd, macdsignal, args.loose):
             continue
-        if not macd_indicator.is_about_to_golden_cross(macdhist, args.strict):
+        if not macd_indicator.is_about_to_golden_cross(macdhist, args.loose):
             continue
 
         # Check child period.
-        if idx > 0 and args.child_period:
+        if idx > 0 and not args.skip_child:
             time.sleep(args.interval)
             period_cur = constants.PERIODS[idx - 1]
             kline = XueQiu.kline(symbol, period_cur)
             macd, macdsignal, macdhist = macd_indicator.clean_macd(kline.close)
             if not macd_indicator.is_about_to_bottom_divergence(
-                    macd, macdsignal, macd_indicator, args.strict):
+                    macd, macdsignal, macd_indicator, args.loose):
                 continue
 
         candidate_buy.add(symbol)

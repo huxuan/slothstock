@@ -16,8 +16,7 @@ BUY_PARSER = argparse.ArgumentParser(add_help=False)
 _BUY_GROUP = BUY_PARSER.add_argument_group('Buy')
 _BUY_GROUP.add_argument('--reserve-st', action='store_true')
 _BUY_GROUP.add_argument('--reserve-suspend', action='store_true')
-_BUY_GROUP.add_argument('-G', '--great-great-grandparent-period',
-                        action='store_true')
+_BUY_GROUP.add_argument('--check-great-great-grandparent', action='store_true')
 
 # MISC
 MISC_PARSER = argparse.ArgumentParser(add_help=False)
@@ -33,8 +32,8 @@ SLOTHSTOCK_PARSER = argparse.ArgumentParser(add_help=False)
 _SLOTHSTOCK_GROUP = SLOTHSTOCK_PARSER.add_argument_group('SlothStock')
 _SLOTHSTOCK_GROUP.add_argument('--ebk', action='append', default=[])
 _SLOTHSTOCK_GROUP.add_argument('--period', default='day')
-_SLOTHSTOCK_GROUP.add_argument('--strict', action='store_true')
-_SLOTHSTOCK_GROUP.add_argument('-C', '--child-period', action='store_true')
+_SLOTHSTOCK_GROUP.add_argument('--loose', action='store_true')
+_SLOTHSTOCK_GROUP.add_argument('--skip-child', action='store_true')
 
 # WxPusher
 WXPUSHER_PARSER = argparse.ArgumentParser(add_help=False)
