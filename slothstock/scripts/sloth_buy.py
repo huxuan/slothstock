@@ -84,7 +84,7 @@ def check_buy(stocks, args):
             kline = XueQiu.kline(symbol, period_cur)
             macd, macdsignal, macdhist = macd_indicator.clean_macd(kline.close)
             if not macd_indicator.is_about_to_bottom_divergence(
-                    macd, macdsignal, macd_indicator, args.loose):
+                    macd, macdsignal, macdhist, args.loose):
                 continue
 
         candidate_buy.add(symbol)
