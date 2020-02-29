@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 from slothstock import constants
 from slothstock import utils
-from slothstock.indicators import macd_indicator
+from slothstock.indicators import MACD
 from slothstock.providers import XueQiu
 from slothstock.scripts import common
 from slothstock.scripts import parsers
@@ -53,38 +53,36 @@ def check_buy(stocks, args):
         if idx + 4 < len(constants.PERIODS) and \
                 args.check_great_great_grandparent:
             time.sleep(args.interval)
-            period_cur = constants.PERIODS[idx + 4]
-            kline = XueQiu.kline(symbol, period_cur)
-            _, _, macdhist = macd_indicator.clean_macd(kline.close)
-            if not macd_indicator.is_golden_cross(macdhist, args.loose):
+            kline = XueQiu.kline(symbol, constants.PERIODS[idx + 4])
+            macd = MACD(kline.close)
+            if not macd.golden or (not args.loose and not macd.expand):
                 continue
 
         # Check grandparent period.
         if idx + 2 < len(constants.PERIODS):
             time.sleep(args.interval)
-            period_cur = constants.PERIODS[idx + 2]
-            kline = XueQiu.kline(symbol, period_cur)
-            _, _, macdhist = macd_indicator.clean_macd(kline.close)
-            if not macd_indicator.is_golden_cross(macdhist, args.loose):
+            kline = XueQiu.kline(symbol, constants.PERIODS[idx + 2])
+            macd = MACD(kline.close)
+            if not macd.golden or (not args.loose and not macd.expand):
                 continue
 
         # Check current period.
         time.sleep(args.interval)
         kline = XueQiu.kline(symbol, args.period)
-        macd, macdsignal, macdhist = macd_indicator.clean_macd(kline.close)
-        if not macd_indicator.is_negative(macd, macdsignal, args.loose):
-            continue
-        if not macd_indicator.is_about_to_golden_cross(macdhist, args.loose):
+        macd = MACD(kline.close)
+        if not macd.negative or not macd.death or \
+                (not args.loose and not macd.narrow):
             continue
 
         # Check child period.
-        if idx > 0 and not args.skip_child:
+        if idx > 0 and args.child:
             time.sleep(args.interval)
-            period_cur = constants.PERIODS[idx - 1]
-            kline = XueQiu.kline(symbol, period_cur)
-            macd, macdsignal, macdhist = macd_indicator.clean_macd(kline.close)
-            if not macd_indicator.is_about_to_bottom_divergence(
-                    macd, macdsignal, macdhist, args.loose):
+            kline = XueQiu.kline(symbol, constants.PERIODS[idx - 1])
+            macd = MACD(kline.close)
+            if args.child == constants.CHILD_CHOICE_CROSS:
+                if not macd.death or (not args.loose and not macd.narrow):
+                    continue
+            elif not macd.will_bottom_divergence:
                 continue
 
         candidate_buy.add(symbol)

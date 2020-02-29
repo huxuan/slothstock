@@ -7,3 +7,8 @@ File: __init__.py
 Author: huxuan
 Email: i(at)huxuan.org
 """
+from slothstock.indicators.macd import MACD
+
+__all__ = [
+    'MACD',
+]

@@ -10,6 +10,8 @@ Email: i(at)huxuan.org
 import argparse
 
 from slothstock import __version__
+from slothstock import constants
+
 
 # Buy only
 BUY_PARSER = argparse.ArgumentParser(add_help=False)
@@ -33,7 +35,9 @@ _SLOTHSTOCK_GROUP = SLOTHSTOCK_PARSER.add_argument_group('SlothStock')
 _SLOTHSTOCK_GROUP.add_argument('--ebk', action='append', default=[])
 _SLOTHSTOCK_GROUP.add_argument('--period', default='day')
 _SLOTHSTOCK_GROUP.add_argument('--loose', action='store_true')
-_SLOTHSTOCK_GROUP.add_argument('--skip-child', action='store_true')
+_SLOTHSTOCK_GROUP.add_argument('--child', default=constants.CHILD_CHOICE_CROSS,
+                               choices=constants.CHILD_CHOICES)
+
 
 # WxPusher
 WXPUSHER_PARSER = argparse.ArgumentParser(add_help=False)

@@ -25,9 +25,9 @@ $ sloth-buy -h
 usage: sloth-buy [-h] [--reserve-st] [--reserve-suspend]
                  [--check-great-great-grandparent] [--daemon]
                  [--interval INTERVAL] [--ignore-empty] [--output OUTPUT] [-V]
-                 [--ebk EBK] [--period PERIOD] [--loose] [--skip-child]
-                 [--title TITLE] [--token TOKEN] [--topic-ids TOPIC_IDS]
-                 [--uids UIDS]
+                 [--ebk EBK] [--period PERIOD] [--loose]
+                 [--child {cross,divergence}] [--title TITLE] [--token TOKEN]
+                 [--topic-ids TOPIC_IDS] [--uids UIDS]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -46,7 +46,7 @@ SlothStock:
   --ebk EBK
   --period PERIOD
   --loose
-  --skip-child
+  --child {cross,divergence}
 
 WxPusher:
   --title TITLE
@@ -60,8 +60,8 @@ $ sloth-sell -h
 
 usage: sloth-sell [-h] [--daemon] [--interval INTERVAL] [--ignore-empty]
                   [--output OUTPUT] [-V] [--ebk EBK] [--period PERIOD]
-                  [--loose] [--skip-child] [--title TITLE] [--token TOKEN]
-                  [--topic-ids TOPIC_IDS] [--uids UIDS]
+                  [--loose] [--child {cross,divergence}] [--title TITLE]
+                  [--token TOKEN] [--topic-ids TOPIC_IDS] [--uids UIDS]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -75,7 +75,7 @@ SlothStock:
   --ebk EBK
   --period PERIOD
   --loose
-  --skip-child
+  --child {cross,divergence}
 
 WxPusher:
   --title TITLE

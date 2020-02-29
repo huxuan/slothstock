@@ -13,7 +13,7 @@ import time
 from tqdm import tqdm
 
 from slothstock import constants
-from slothstock.indicators import macd_indicator
+from slothstock.indicators import MACD
 from slothstock.providers import XueQiu
 from slothstock.scripts import common
 from slothstock.scripts import parsers
@@ -39,21 +39,30 @@ def check_sell(stocks, args):
     for symbol in pbar:
         pbar.set_description(symbol)
 
+        # Check parent period.
+        if idx + 1 < len(constants.PERIODS):
+            time.sleep(args.interval)
+            kline = XueQiu.kline(symbol, constants.PERIODS[idx + 1])
+            macd = MACD(kline.close)
+            if not macd.golden or (not args.loose and not macd.narrow):
+                continue
+
         # Check current period.
         time.sleep(args.interval)
         kline = XueQiu.kline(symbol, args.period)
-        _, _, macdhist = macd_indicator.clean_macd(kline.close)
-        if not macd_indicator.is_about_to_death_cross(macdhist, args.loose):
+        macd = MACD(kline.close)
+        if not macd.golden or (not args.loose and not macd.narrow):
             continue
 
         # Check child period.
-        if idx > 0 and not args.skip_child:
+        if idx > 0 and args.child:
             time.sleep(args.interval)
-            period_cur = constants.PERIODS[idx - 1]
-            kline = XueQiu.kline(symbol, period_cur)
-            _, _, macdhist = macd_indicator.clean_macd(kline.close)
-            if not macd_indicator.is_about_to_death_cross(
-                    macdhist, args.loose):
+            kline = XueQiu.kline(symbol, constants.PERIODS[idx - 1])
+            macd = MACD(kline.close)
+            if args.child == constants.CHILD_CHOICE_CROSS:
+                if not macd.golden or (not args.loose and not macd.narrow):
+                    continue
+            elif not macd.will_top_divergence:
                 continue
 
         candidate_sell.add(symbol)
