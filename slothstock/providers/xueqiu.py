@@ -57,10 +57,10 @@ def check_response(res):
     try:
         res = res.json()
     except ValueError:
-        return exceptions.InvalidResultError(res.content)
+        raise exceptions.InvalidResultError(res.content)
 
     if res.get('error_code') != 0:
-        return exceptions.XueQiuError(
+        raise exceptions.XueQiuError(
             res['error_code'],
             res['error_description'])
 
@@ -70,8 +70,8 @@ def check_response(res):
     return res
 
 
-class MetaXueQiu(type):
-    """Metaclass for XueQiu."""
+class XueQiu():
+    """XueQiu provider."""
 
     session = utils.create_fake_session(XUEQIU_URL)
 
@@ -168,7 +168,3 @@ class MetaXueQiu(type):
             stocks = stocks[stocks.index.isin(res)]
 
         return stocks
-
-
-class XueQiu(metaclass=MetaXueQiu):  # pylint: disable=too-few-public-methods
-    """XueQiu provider."""
