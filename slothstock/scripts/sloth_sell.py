@@ -12,7 +12,8 @@ import time
 
 from tqdm import tqdm
 
-from slothstock import constants
+from slothstock.constants import CHILD_CHOICE_CROSS
+from slothstock.constants import PERIODS
 from slothstock.indicators import MACD
 from slothstock.providers import XueQiu
 from slothstock.scripts import common
@@ -21,18 +22,22 @@ from slothstock.scripts import parsers
 
 def parse_args():
     """Argument Parser."""
-    parser = argparse.ArgumentParser(parents=[
-        parsers.MISC_PARSER,
-        parsers.SLOTHSTOCK_PARSER,
-        parsers.WXPUSHER_PARSER,
-    ])
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        parents=[
+            parsers.MISC_PARSER,
+            parsers.SELL_PARSER,
+            parsers.SLOTHSTOCK_PARSER,
+            parsers.WXPUSHER_PARSER,
+        ],
+    )
     return parser.parse_args()
 
 
 def check_sell(stocks, args):
     """Check sell signals."""
     symbols = stocks.sample(frac=1).index
-    idx = constants.PERIODS.index(args.period)
+    idx = PERIODS.index(args.period)
     candidate_sell = set()
 
     pbar = tqdm(symbols, disable=args.daemon)
@@ -40,16 +45,16 @@ def check_sell(stocks, args):
         pbar.set_description(symbol)
 
         # Check parent period.
-        if idx + 1 < len(constants.PERIODS):
+        if idx + 1 < len(PERIODS) and args.check_parent:
             time.sleep(args.interval)
-            kline = XueQiu.kline(symbol, constants.PERIODS[idx + 1])
+            kline = XueQiu.kline(symbol, PERIODS[idx + 1], args.datetime)
             macd = MACD(kline.close)
             if not macd.golden or (not args.loose and not macd.narrow):
                 continue
 
         # Check current period.
         time.sleep(args.interval)
-        kline = XueQiu.kline(symbol, args.period)
+        kline = XueQiu.kline(symbol, args.period, args.datetime)
         macd = MACD(kline.close)
         if not macd.golden or (not args.loose and not macd.narrow):
             continue
@@ -57,9 +62,9 @@ def check_sell(stocks, args):
         # Check child period.
         if idx > 0 and args.child:
             time.sleep(args.interval)
-            kline = XueQiu.kline(symbol, constants.PERIODS[idx - 1])
+            kline = XueQiu.kline(symbol, PERIODS[idx - 1], args.datetime)
             macd = MACD(kline.close)
-            if args.child == constants.CHILD_CHOICE_CROSS:
+            if args.child == CHILD_CHOICE_CROSS:
                 if not macd.golden or (not args.loose and not macd.narrow):
                     continue
             elif not macd.will_top_divergence:

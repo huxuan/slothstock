@@ -26,62 +26,111 @@ usage: sloth-buy [-h] [--reserve-st] [--reserve-suspend]
                  [--check-great-great-grandparent] [--daemon]
                  [--interval INTERVAL] [--ignore-empty] [--output OUTPUT] [-V]
                  [--ebk EBK] [--period PERIOD] [--loose]
-                 [--child {cross,divergence}] [--title TITLE] [--token TOKEN]
-                 [--topic-ids TOPIC_IDS] [--uids UIDS]
+                 [--child {cross,divergence}] [--datetime DATETIME]
+                 [--title TITLE] [--token TOKEN] [--topic-ids TOPIC_IDS]
+                 [--uids UIDS]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --daemon
-  --interval INTERVAL
-  --ignore-empty
-  --output OUTPUT
+  --daemon              Flag of daemon mode, no console output. (default:
+                        False)
+  --interval INTERVAL   Time interval in seconds between successive requests
+                        in providers. (default: 0.1)
+  --ignore-empty        Flag for no output or notification when the result is
+                        empty. (default: False)
+  --output OUTPUT       The output file in ebk format for the results.
+                        (default: None)
   -V, --version         show program's version number and exit
 
 Buy:
-  --reserve-st
-  --reserve-suspend
+  --reserve-st          Flag to reserve ST stocks. (default: False)
+  --reserve-suspend     Flag to reserve suspended stocks. (default: False)
   --check-great-great-grandparent
+                        Flag to check great_great_grandparent period.
+                        (default: False)
 
 SlothStock:
-  --ebk EBK
-  --period PERIOD
-  --loose
+  --ebk EBK             Stock candidates in ebk format file. If not specified,
+                        all stocks are processed. Note that multiple of them
+                        are supported. (default: [])
+  --period PERIOD       Check signal for specific period. Valid choices are
+                        `1m`, `5m`, `15m`, `60m`, `day`, `week`, `month`,
+                        `quarter`, `year`. (default: day)
+  --loose               Flag of loose mode for signal check. (default: False)
   --child {cross,divergence}
+                        Child check mode, it should be `cross` or
+                        `divergence`. If no specified, child period check will
+                        be skipped. (default: None)
+  --datetime DATETIME   The datetime compatible with ISO 8601 format (`YY-MM-
+                        DD` or `YYYY-MM-DDTHH:MM`) for signal check, mostly
+                        for testing purpose. (default: None)
 
 WxPusher:
-  --title TITLE
-  --token TOKEN
+  --title TITLE         The `title` for the notification. (default: None)
+  --token TOKEN         The `token` for the notification. None means no
+                        notification (default: None)
   --topic-ids TOPIC_IDS
-  --uids UIDS
+                        The `topic_ids` for the notification. Note that
+                        multiple of them are supported and no notification
+                        will be sent if both `topic_ids` and `uids` are None,
+                        (default: [])
+  --uids UIDS           The `uids` for the notification. Note that multiple of
+                        them are supported and no notification will be sent if
+                        both `topic_ids` and `uids` are None. (default: [])
 ```
 
 ```shell
 $ sloth-sell -h
 
 usage: sloth-sell [-h] [--daemon] [--interval INTERVAL] [--ignore-empty]
-                  [--output OUTPUT] [-V] [--ebk EBK] [--period PERIOD]
-                  [--loose] [--child {cross,divergence}] [--title TITLE]
-                  [--token TOKEN] [--topic-ids TOPIC_IDS] [--uids UIDS]
+                  [--output OUTPUT] [-V] [--check-parent] [--ebk EBK]
+                  [--period PERIOD] [--loose] [--child {cross,divergence}]
+                  [--datetime DATETIME] [--title TITLE] [--token TOKEN]
+                  [--topic-ids TOPIC_IDS] [--uids UIDS]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --daemon
-  --interval INTERVAL
-  --ignore-empty
-  --output OUTPUT
+  --daemon              Flag of daemon mode, no console output. (default:
+                        False)
+  --interval INTERVAL   Time interval in seconds between successive requests
+                        in providers. (default: 0.1)
+  --ignore-empty        Flag for no output or notification when the result is
+                        empty. (default: False)
+  --output OUTPUT       The output file in ebk format for the results.
+                        (default: None)
   -V, --version         show program's version number and exit
 
+Sell:
+  --check-parent        Flag to check parent period. (default: False)
+
 SlothStock:
-  --ebk EBK
-  --period PERIOD
-  --loose
+  --ebk EBK             Stock candidates in ebk format file. If not specified,
+                        all stocks are processed. Note that multiple of them
+                        are supported. (default: [])
+  --period PERIOD       Check signal for specific period. Valid choices are
+                        `1m`, `5m`, `15m`, `60m`, `day`, `week`, `month`,
+                        `quarter`, `year`. (default: day)
+  --loose               Flag of loose mode for signal check. (default: False)
   --child {cross,divergence}
+                        Child check mode, it should be `cross` or
+                        `divergence`. If no specified, child period check will
+                        be skipped. (default: None)
+  --datetime DATETIME   The datetime compatible with ISO 8601 format (`YY-MM-
+                        DD` or `YYYY-MM-DDTHH:MM`) for signal check, mostly
+                        for testing purpose. (default: None)
 
 WxPusher:
-  --title TITLE
-  --token TOKEN
+  --title TITLE         The `title` for the notification. (default: None)
+  --token TOKEN         The `token` for the notification. None means no
+                        notification (default: None)
   --topic-ids TOPIC_IDS
-  --uids UIDS
+                        The `topic_ids` for the notification. Note that
+                        multiple of them are supported and no notification
+                        will be sent if both `topic_ids` and `uids` are None,
+                        (default: [])
+  --uids UIDS           The `uids` for the notification. Note that multiple of
+                        them are supported and no notification will be sent if
+                        both `topic_ids` and `uids` are None. (default: [])
 ```
 
 ## 运行测试
