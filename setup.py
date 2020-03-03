@@ -13,6 +13,8 @@ from setuptools import find_packages
 from setuptools import setup
 
 NAME = 'slothstock'
+AUTHOR = 'huxuan'
+EMAIL = f'i+{NAME}@huxuan.org'
 
 DESCRIPTION = (
     'Stock for Sloth.'
@@ -45,7 +47,7 @@ try:
 except DistributionNotFound:
     VERSION = 'master'
 
-PROJECT_URL = f'https://github.com/huxuan/{NAME}'
+PROJECT_URL = f'https://github.com/{AUTHOR}/{NAME}'
 BASE_URL = f'{PROJECT_URL}/blob/{VERSION}'
 
 
@@ -65,8 +67,8 @@ setup(name=NAME,
       classifiers=CLASSIFIERS,
       keywords=' '.join(KEYWORDS),
       url=PROJECT_URL,
-      author='Xuan (Sean) Hu',
-      author_email=f'i+{NAME}@huxuan.org',
+      author=AUTHOR,
+      author_email=EMAIL,
       license='MIT',
       packages=find_packages(exclude=['tests']),
       use_scm_version=True,
