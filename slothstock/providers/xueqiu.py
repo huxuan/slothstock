@@ -20,12 +20,18 @@ XUEQIU_ETF_LIST_URL = 'https://xueqiu.com/service/v5/stock/screener/fund/list'
 XUEQIU_KLINE_URL = 'https://stock.xueqiu.com/v5/stock/chart/kline.json'
 XUEQIU_LIST_URL = 'https://xueqiu.com/service/v5/stock/screener/quote/list'
 XUEQIU_QUOTE_URL = 'https://xueqiu.com/service/v5/stock/batch/quote'
+XUEQIU_REALTIME_URL = 'https://stock.xueqiu.com/v5/stock/realtime/quotec.json'
 XUEQIU_URL = 'https://xueqiu.com/'
 
 
 def symbol_transform(symbol):
     """Transform symbol for XueQiu."""
     return ''.join(symbol.split('.')[::-1])
+
+
+def symbols_tranform(symbols):
+    """Transform symbols for XueQiu."""
+    return ','.join(symbol_transform(symbol) for symbol in symbols)
 
 
 def symbol_restore(symbol):
@@ -168,3 +174,19 @@ class XueQiu():
             stocks = stocks[stocks.index.isin(res)]
 
         return stocks
+
+    @classmethod
+    def quote(cls, symbols):
+        """Get the quote information."""
+        url = XUEQIU_REALTIME_URL
+        params = {
+            '_': datetime_to_timestamp(),
+            'symbol': symbols_tranform(symbols)
+        }
+        res = utils.requests_retry_session(cls.session).get(url, params=params)
+        res = check_response(res)
+
+        data = pandas.DataFrame(res['data'])
+        data.symbol = data.symbol.apply(symbol_restore)
+        data.set_index('symbol', inplace=True)
+        return data
