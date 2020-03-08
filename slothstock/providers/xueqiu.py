@@ -101,7 +101,7 @@ class XueQiu():
             columns=res['data'].get('column'))
         data.timestamp = data.timestamp // 1000
         data.set_index('timestamp', inplace=True)
-        return data
+        return data.reindex(columns=constants.KLINE_COLUMNS)
 
     @classmethod
     def quote(cls, symbol_or_list):
@@ -120,8 +120,12 @@ class XueQiu():
         data = pandas.DataFrame(res['data'])
         data.symbol = data.symbol.apply(symbol_restore)
         data.timestamp = data.timestamp // 1000
-        data.set_index('symbol', inplace=True)
-        return data
+        data.rename(columns={'current': 'close'}, inplace=True)
+        if isinstance(symbol_or_list, list):
+            data.set_index('symbol', inplace=True)
+        else:
+            data.set_index('timestamp', inplace=True)
+        return data.reindex(columns=constants.KLINE_COLUMNS)
 
     @classmethod
     def list(cls, url=XUEQIU_LIST_URL, **params):
@@ -139,8 +143,9 @@ class XueQiu():
 
         data = pandas.DataFrame(res['data']['list'])
         data.symbol = data.symbol.apply(symbol_restore)
+        data.rename(columns={'current': 'close'}, inplace=True)
         data.set_index('symbol', inplace=True)
-        return data
+        return data.reindex(columns=constants.LIST_COLUMNS)
 
     @classmethod
     def list_ashare(cls, **params):
@@ -175,8 +180,9 @@ class XueQiu():
             item['quote'] for item in res['data'].get('items', [])
         ])
         data.symbol = data.symbol.apply(symbol_restore)
+        data.rename(columns={'current': 'close'}, inplace=True)
         data.set_index('symbol', inplace=True)
-        return data
+        return data.reindex(columns=constants.LIST_COLUMNS)
 
     @classmethod
     def list_stocks(cls, ebk=None):
