@@ -116,6 +116,7 @@ class XueQiu():
 
         data = pandas.DataFrame(res['data'])
         data.symbol = data.symbol.apply(symbol_restore)
+        data.timestamp = data.timestamp // 1000
         data.set_index('symbol', inplace=True)
         return data
 
