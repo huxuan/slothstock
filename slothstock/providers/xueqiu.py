@@ -29,8 +29,8 @@ def symbol_transform(symbol):
     return ''.join(symbol.split('.')[::-1])
 
 
-def symbols_tranform(symbols):
-    """Transform symbols for XueQiu."""
+def symbol_list_transform(symbols):
+    """Transform symbol list for XueQiu."""
     return ','.join(symbol_transform(symbol) for symbol in symbols)
 
 
@@ -104,13 +104,16 @@ class XueQiu():
         return data
 
     @classmethod
-    def quote(cls, symbols):
+    def quote(cls, symbol_or_list):
         """Get the quote information."""
         url = XUEQIU_REALTIME_URL
         params = {
             '_': datetime_to_timestamp(),
-            'symbol': symbols_tranform(symbols)
         }
+        if isinstance(symbol_or_list, list):
+            params['symbol'] = symbol_list_transform(symbol_or_list)
+        else:
+            params['symbol'] = symbol_transform(symbol_or_list)
         res = utils.requests_retry_session(cls.session).get(url, params=params)
         res = check_response(res)
 

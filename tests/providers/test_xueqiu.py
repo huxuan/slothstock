@@ -25,6 +25,13 @@ class TestXueQiu(unittest.TestCase):
         self.assertIsInstance(res, pandas.DataFrame)
         self.assertGreater(len(res.index), 0)
 
+    def test_quote(self):
+        """Positive case for quote."""
+        res = XueQiu.quote('000001.SH')
+        self.assertIsInstance(res, pandas.DataFrame)
+        res = XueQiu.quote(['512000.SH', '000029.SZ'])
+        self.assertIsInstance(res, pandas.DataFrame)
+
     def test_list(self):
         """Positive case for list."""
         res = XueQiu.list()
@@ -48,8 +55,3 @@ class TestXueQiu(unittest.TestCase):
         res = XueQiu.list_index()
         self.assertIsInstance(res, pandas.DataFrame)
         self.assertEqual(len(res.index), 4)
-
-    def test_quote(self):
-        """Positive case for quote."""
-        res = XueQiu.quote(['000001.SH', '512000.SH', '000029.SZ'])
-        self.assertIsInstance(res, pandas.DataFrame)
