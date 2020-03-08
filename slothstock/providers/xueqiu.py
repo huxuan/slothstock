@@ -99,9 +99,8 @@ class XueQiu():
         data = pandas.DataFrame(
             data=res['data'].get('item'),
             columns=res['data'].get('column'))
-        data.rename(columns={'timestamp': 'datetime'}, inplace=True)
-        data.datetime = data.datetime.apply(timestamp_to_datetime)
-        data.set_index('datetime', inplace=True)
+        data.timestamp = data.timestamp // 1000
+        data.set_index('timestamp', inplace=True)
         return data
 
     @classmethod
