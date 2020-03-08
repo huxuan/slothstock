@@ -104,6 +104,22 @@ class XueQiu():
         return data
 
     @classmethod
+    def quote(cls, symbols):
+        """Get the quote information."""
+        url = XUEQIU_REALTIME_URL
+        params = {
+            '_': datetime_to_timestamp(),
+            'symbol': symbols_tranform(symbols)
+        }
+        res = utils.requests_retry_session(cls.session).get(url, params=params)
+        res = check_response(res)
+
+        data = pandas.DataFrame(res['data'])
+        data.symbol = data.symbol.apply(symbol_restore)
+        data.set_index('symbol', inplace=True)
+        return data
+
+    @classmethod
     def list(cls, url=XUEQIU_LIST_URL, **params):
         """List stock information."""
         params.update({
@@ -173,19 +189,3 @@ class XueQiu():
             stocks = stocks[stocks.index.isin(res)]
 
         return stocks
-
-    @classmethod
-    def quote(cls, symbols):
-        """Get the quote information."""
-        url = XUEQIU_REALTIME_URL
-        params = {
-            '_': datetime_to_timestamp(),
-            'symbol': symbols_tranform(symbols)
-        }
-        res = utils.requests_retry_session(cls.session).get(url, params=params)
-        res = check_response(res)
-
-        data = pandas.DataFrame(res['data'])
-        data.symbol = data.symbol.apply(symbol_restore)
-        data.set_index('symbol', inplace=True)
-        return data
